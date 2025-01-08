@@ -1,7 +1,7 @@
-# Snake-AI
-[![license](https://img.shields.io/github/license/MuGemSt/Snake-AI.svg)](https://github.com/MuGemSt/Snake-AI/blob/main/LICENSE)
-[![bilibili](https://img.shields.io/badge/bilibili-BV18GDZYmEke-fc8bab.svg)](https://www.bilibili.com/video/BV18GDZYmEke)
-[![GitHub release](https://img.shields.io/github/release/MuGemSt/Snake-AI.svg)](https://github.com/MuGemSt/Snake-AI/releases/latest)
+# SnakeAI
+[![license](https://img.shields.io/github/license/Genius-Society/SnakeAI.svg)](https://github.com/Genius-Society/SnakeAI/blob/main/LICENSE)
+[![bilibili](https://img.shields.io/badge/bilibili-BV1bqrgYXEsn-fc8bab.svg)](https://www.bilibili.com/video/BV1bqrgYXEsn)
+[![GitHub release](https://img.shields.io/github/release/Genius-Society/SnakeAI.svg)](https://github.com/Genius-Society/SnakeAI/releases/latest)
 
 This project aims to use deep reinforcement learning (DRL) to play Snake game automatically. The core DRL method used here is PPO for discrete, which has brilliant performance in the field of discrete action space like in continuous action space. You just need half an hour to train the snake agent and then it can take effect.
 
@@ -45,5 +45,5 @@ python plotter.py --history ./logs/reward_round3_82.5.csv
 3. A particularly high reward for eating food can lead to quick success regardless of long-term safety
 
 ## Future work
-1. Training time is too short to reflect the advantages of DRL compared to none-DRL method ([Snaqe](https://github.com/MuGemSt/Snake-AI/tree/qt))
+1. Training time is too short to reflect the advantages of DRL compared to none-DRL method ([Snaqe](https://github.com/Genius-Society/SnakeAI/tree/qt))
 2. The zigzag of snake body looks ugly, try to add punishment into reward for too many zigzags
