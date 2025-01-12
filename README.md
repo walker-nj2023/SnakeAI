@@ -21,12 +21,12 @@ python snake.py # evaluate latest saved model
 
 ### Evaluate assigned model
 ```bash
-python evaluate.py --weight ./model/act-weight_round3_472_82.5.pkl
+python evaluate.py # --weight ./model/act-weight_round3_472_82.5.pkl
 ```
 
 ### Plot assigned reward log
 ```bash
-python plotter.py --history ./logs/reward_round3_82.5.csv
+python plot.py # --history ./logs/reward_round3_82.5.csv
 ```
 
 ## Experiments
