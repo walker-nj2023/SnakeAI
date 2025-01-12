@@ -1,7 +1,7 @@
 # SnakeAI
 [![license](https://img.shields.io/github/license/Genius-Society/SnakeAI.svg)](https://github.com/Genius-Society/SnakeAI/blob/main/LICENSE)
-[![bilibili](https://img.shields.io/badge/bilibili-BV1bqrgYXEsn-fc8bab.svg)](https://www.bilibili.com/video/BV1bqrgYXEsn)
 [![GitHub release](https://img.shields.io/github/release/Genius-Society/SnakeAI.svg)](https://github.com/Genius-Society/SnakeAI/releases/latest)
+[![bilibili](https://img.shields.io/badge/bilibili-BV1bqrgYXEsn-fc8bab.svg)](https://www.bilibili.com/video/BV1bqrgYXEsn)
 
 This project aims to use deep reinforcement learning (DRL) to play Snake game automatically. The core DRL method used here is PPO for discrete, which has brilliant performance in the field of discrete action space like in continuous action space. You just need half an hour to train the snake agent and then it can take effect.
 
