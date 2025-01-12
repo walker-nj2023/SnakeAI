@@ -8,17 +8,19 @@ class ActorPPO(nn.Module):
     def __init__(self, mid_dim, state_dim, action_dim):
         super().__init__()
         self.net = nn.Sequential(
-            nn.Linear(state_dim, mid_dim), nn.ReLU(),
-            nn.Linear(mid_dim, mid_dim), nn.ReLU(),
-            nn.Linear(mid_dim, mid_dim), nn.Hardswish(),
-            nn.Linear(mid_dim, action_dim)
+            nn.Linear(state_dim, mid_dim),
+            nn.ReLU(),
+            nn.Linear(mid_dim, mid_dim),
+            nn.ReLU(),
+            nn.Linear(mid_dim, mid_dim),
+            nn.Hardswish(),
+            nn.Linear(mid_dim, action_dim),
         )
         # output layer for action
         layer_norm(self.net[-1], std=0.1)
         # the logarithm (log) of standard deviation (std) of action, it is a trainable parameter
         self.a_logstd = nn.Parameter(
-            torch.zeros((1, action_dim)) - 0.5,
-            requires_grad=True
+            torch.zeros((1, action_dim)) - 0.5, requires_grad=True
         )
         self.sqrt_2pi_log = np.log(np.sqrt(2 * np.pi))
 
@@ -54,10 +56,13 @@ class ActorDiscretePPO(nn.Module):
     def __init__(self, mid_dim, state_dim, action_dim):
         super().__init__()
         self.net = nn.Sequential(
-            nn.Linear(state_dim, mid_dim), nn.ReLU(),
-            nn.Linear(mid_dim, mid_dim), nn.ReLU(),
-            nn.Linear(mid_dim, mid_dim), nn.Hardswish(),
-            nn.Linear(mid_dim, action_dim)
+            nn.Linear(state_dim, mid_dim),
+            nn.ReLU(),
+            nn.Linear(mid_dim, mid_dim),
+            nn.ReLU(),
+            nn.Linear(mid_dim, mid_dim),
+            nn.Hardswish(),
+            nn.Linear(mid_dim, action_dim),
         )
         self.action_dim = action_dim
         self.soft_max = nn.Softmax(dim=-1)
@@ -89,10 +94,13 @@ class CriticAdv(nn.Module):
     def __init__(self, mid_dim, state_dim):
         super().__init__()
         self.net = nn.Sequential(
-            nn.Linear(state_dim, mid_dim), nn.ReLU(),
-            nn.Linear(mid_dim, mid_dim), nn.ReLU(),
-            nn.Linear(mid_dim, mid_dim), nn.Hardswish(),
-            nn.Linear(mid_dim, 1)
+            nn.Linear(state_dim, mid_dim),
+            nn.ReLU(),
+            nn.Linear(mid_dim, mid_dim),
+            nn.ReLU(),
+            nn.Linear(mid_dim, mid_dim),
+            nn.Hardswish(),
+            nn.Linear(mid_dim, 1),
         )
         layer_norm(self.net[-1], std=0.5)  # output layer for Q value
 
@@ -130,28 +138,26 @@ class ReplayBuffer:
         size = len(other)
         next_idx = self.next_idx + size
         if next_idx > self.max_len:
-            self.buf_state[self.next_idx:self.max_len] = state[:self.max_len - self.next_idx]
-            self.buf_other[self.next_idx:self.max_len] = other[:self.max_len - self.next_idx]
+            self.buf_state[self.next_idx : self.max_len] = state[
+                : self.max_len - self.next_idx
+            ]
+            self.buf_other[self.next_idx : self.max_len] = other[
+                : self.max_len - self.next_idx
+            ]
             self.if_full = True
             next_idx = next_idx - self.max_len
             self.buf_state[0:next_idx] = state[-next_idx:]
             self.buf_other[0:next_idx] = other[-next_idx:]
 
         else:
-            self.buf_state[self.next_idx:next_idx] = state
-            self.buf_other[self.next_idx:next_idx] = other
+            self.buf_state[self.next_idx : next_idx] = state
+            self.buf_other[self.next_idx : next_idx] = other
 
         self.next_idx = next_idx
 
     def extend_buffer_from_list(self, trajectory_list):
-        state_ary = np.array(
-            [item[0] for item in trajectory_list],
-            dtype=np.float32
-        )
-        other_ary = np.array(
-            [item[1] for item in trajectory_list],
-            dtype=np.float32
-        )
+        state_ary = np.array([item[0] for item in trajectory_list], dtype=np.float32)
+        other_ary = np.array([item[1] for item in trajectory_list], dtype=np.float32)
         self.extend_buffer(state_ary, other_ary)
 
     def sample_batch(self, batch_size):
@@ -162,25 +168,19 @@ class ReplayBuffer:
             r_m_a[:, 1:2],  # mask = 0.0 if done else gamma
             r_m_a[:, 2:],  # action
             self.buf_state[indices],  # state
-            self.buf_state[indices + 1]
+            self.buf_state[indices + 1],
         )  # next_state
 
     def sample_all(self):
-        all_other = torch.as_tensor(
-            self.buf_other[:self.now_len],
-            device=self.device
-        )
+        all_other = torch.as_tensor(self.buf_other[: self.now_len], device=self.device)
 
         return (
             all_other[:, 0],  # reward
             all_other[:, 1],  # mask = 0.0 if done else gamma
-            all_other[:, 2:2 + self.action_dim],  # action
+            all_other[:, 2 : 2 + self.action_dim],  # action
             # action_noise or action_prob
-            all_other[:, 2 + self.action_dim:],
-            torch.as_tensor(
-                self.buf_state[:self.now_len],
-                device=self.device
-            )
+            all_other[:, 2 + self.action_dim :],
+            torch.as_tensor(self.buf_state[: self.now_len], device=self.device),
         )  # state
 
     def update_now_len(self):

@@ -22,7 +22,7 @@ python snake.py # evaluate latest saved model
 
 ### Evaluate assigned model
 ```bash
-python evaluate.py # --weight ./model/act-weight_round3_472_82.5.pkl
+python eval.py # --weight ./model/act-weight_round3_472_82.5.pkl
 ```
 
 ### Plot assigned reward log

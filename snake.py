@@ -5,15 +5,15 @@ import random
 import pygame
 import numpy as np
 from PIL import Image
-from Agent import AgentDiscretePPO
+from agent import AgentDiscretePPO
 from torchvision import transforms
 from pygame.locals import *
 
 round = 1  # default mode: round 1
 rewards = [
-    {'eat': 2.0, 'hit': -0.5, 'bit': -0.8},  # round 1
-    {'eat': 2.0, 'hit': -1.0, 'bit': -1.5},  # round 2
-    {'eat': 2.0, 'hit': -1.5,  'bit': -2.0}  # round 3
+    {"eat": 2.0, "hit": -0.5, "bit": -0.8},  # round 1
+    {"eat": 2.0, "hit": -1.0, "bit": -1.5},  # round 2
+    {"eat": 2.0, "hit": -1.5, "bit": -2.0},  # round 3
 ]
 
 
@@ -49,16 +49,19 @@ class Snake:
         self.snake_speed_clock = pygame.time.Clock()  # Create a Pygame clock object
 
         [self.snake_coords, self.direction, self.food, self.state] = [
-            None, None, None, None
+            None,
+            None,
+            None,
+            None,
         ]
 
     def reset(self):
         startx = random.randint(3, self.map_width - 8)  # start position
         starty = random.randint(3, self.map_height - 8)
         self.snake_coords = [
-            {'x': startx, 'y': starty},  # Initial Snake
-            {'x': startx - 1, 'y': starty},
-            {'x': startx - 2, 'y': starty}
+            {"x": startx, "y": starty},  # Initial Snake
+            {"x": startx - 1, "y": starty},
+            {"x": startx - 2, "y": starty},
         ]
         self.direction = self.RIGHT  # move right at start
         self.food = self.get_random_location()  # food random location
@@ -76,7 +79,7 @@ class Snake:
 
         self.move_snake(self.direction, self.snake_coords)
         ret = self.snake_is_alive(self.snake_coords)
-        d = (ret > 0)
+        d = ret > 0
         flag = self.snake_is_eat_food(self.snake_coords, self.food)
         reward = self.getReward(flag, ret)
 
@@ -85,20 +88,18 @@ class Snake:
     def getReward(self, flag, ret):
         reward = 0
         if flag:
-            reward += rewards[round - 1]['eat']
+            reward += rewards[round - 1]["eat"]
 
         if ret == 1:
-            reward += rewards[round - 1]['hit']
+            reward += rewards[round - 1]["hit"]
 
         if ret == 2:
-            reward += rewards[round - 1]['bit']
+            reward += rewards[round - 1]["bit"]
 
         return reward
 
     def render(self):
-        self.screen = pygame.display.set_mode(
-            (self.windows_width, self.windows_height)
-        )
+        self.screen = pygame.display.set_mode((self.windows_width, self.windows_height))
         self.screen.fill(self.BG_COLOR)
         self.draw_snake(self.screen, self.snake_coords)
         self.draw_food(self.screen, self.food)
@@ -109,26 +110,31 @@ class Snake:
     def getState(self):
         # Fundamentals 6 Dimensions
         [xhead, yhead] = [
-            self.snake_coords[self.HEAD]['x'],
-            self.snake_coords[self.HEAD]['y']
+            self.snake_coords[self.HEAD]["x"],
+            self.snake_coords[self.HEAD]["y"],
         ]
-        [xfood, yfood] = [self.food['x'], self.food['y']]
+        [xfood, yfood] = [self.food["x"], self.food["y"]]
         deltax = (xfood - xhead) / self.map_width
         deltay = (yfood - yhead) / self.map_height
         checkPoint = [
-            [xhead, yhead-1],
-            [xhead-1, yhead],
-            [xhead, yhead+1],
-            [xhead+1, yhead]
+            [xhead, yhead - 1],
+            [xhead - 1, yhead],
+            [xhead, yhead + 1],
+            [xhead + 1, yhead],
         ]
         tem = [0, 0, 0, 0]
         for coord in self.snake_coords[1:]:
-            if [coord['x'], coord['y']] in checkPoint:
-                index = checkPoint.index([coord['x'], coord['y']])
+            if [coord["x"], coord["y"]] in checkPoint:
+                index = checkPoint.index([coord["x"], coord["y"]])
                 tem[index] = 1
 
         for i, point in enumerate(checkPoint):
-            if point[0] >= self.map_width or point[0] < 0 or point[1] >= self.map_height or point[1] < 0:
+            if (
+                point[0] >= self.map_width
+                or point[0] < 0
+                or point[1] >= self.map_height
+                or point[1] < 0
+            ):
                 tem[i] = 1
 
         state = [deltax, deltay]
@@ -137,8 +143,8 @@ class Snake:
         return state
 
     def draw_food(self, screen, food):
-        x = food['x'] * self.cell_size
-        y = food['y'] * self.cell_size
+        x = food["x"] * self.cell_size
+        y = food["y"] * self.cell_size
         appleRect = pygame.Rect(x, y, self.cell_size, self.cell_size)
         pygame.draw.rect(screen, self.Red, appleRect)
 
@@ -152,15 +158,14 @@ class Snake:
             if i == len(snake_coords) - 1:
                 color = self.cyan
 
-            x = coord['x'] * self.cell_size
-            y = coord['y'] * self.cell_size
+            x = coord["x"] * self.cell_size
+            y = coord["y"] * self.cell_size
             wormSegmentRect = pygame.Rect(x, y, self.cell_size, self.cell_size)
             pygame.draw.rect(screen, self.dark_blue, wormSegmentRect)
-            wormInnerSegmentRect = pygame.Rect(  # The second layer of bright green inside the snake's body
-                x + 4,
-                y + 4,
-                self.cell_size - 8,
-                self.cell_size - 8
+            wormInnerSegmentRect = (
+                pygame.Rect(  # The second layer of bright green inside the snake's body
+                    x + 4, y + 4, self.cell_size - 8, self.cell_size - 8
+                )
             )
             pygame.draw.rect(screen, color, wormInnerSegmentRect)
 
@@ -168,38 +173,46 @@ class Snake:
     def move_snake(self, direction, snake_coords):
         if direction == self.UP:
             newHead = {
-                'x': snake_coords[self.HEAD]['x'],
-                'y': snake_coords[self.HEAD]['y'] - 1
+                "x": snake_coords[self.HEAD]["x"],
+                "y": snake_coords[self.HEAD]["y"] - 1,
             }
         elif direction == self.DOWN:
             newHead = {
-                'x': snake_coords[self.HEAD]['x'],
-                'y': snake_coords[self.HEAD]['y'] + 1
+                "x": snake_coords[self.HEAD]["x"],
+                "y": snake_coords[self.HEAD]["y"] + 1,
             }
         elif direction == self.LEFT:
             newHead = {
-                'x': snake_coords[self.HEAD]
-                ['x'] - 1, 'y': snake_coords[self.HEAD]['y']
+                "x": snake_coords[self.HEAD]["x"] - 1,
+                "y": snake_coords[self.HEAD]["y"],
             }
         elif direction == self.RIGHT:
             newHead = {
-                'x': snake_coords[self.HEAD]
-                ['x'] + 1, 'y': snake_coords[self.HEAD]['y']
+                "x": snake_coords[self.HEAD]["x"] + 1,
+                "y": snake_coords[self.HEAD]["y"],
             }
         else:
             newHead = None
-            raise Exception('error for direction!')
+            raise Exception("error for direction!")
 
         snake_coords.insert(0, newHead)
 
     # Determine if the snake is dead
     def snake_is_alive(self, snake_coords):
         tag = 0
-        if snake_coords[self.HEAD]['x'] == -1 or snake_coords[self.HEAD]['x'] == self.map_width or snake_coords[self.HEAD]['y'] == -1 or snake_coords[self.HEAD]['y'] == self.map_height:
+        if (
+            snake_coords[self.HEAD]["x"] == -1
+            or snake_coords[self.HEAD]["x"] == self.map_width
+            or snake_coords[self.HEAD]["y"] == -1
+            or snake_coords[self.HEAD]["y"] == self.map_height
+        ):
             tag = 1  # Snake hits the wall
 
         for snake_body in snake_coords[1:]:
-            if snake_body['x'] == snake_coords[self.HEAD]['x'] and snake_body['y'] == snake_coords[self.HEAD]['y']:
+            if (
+                snake_body["x"] == snake_coords[self.HEAD]["x"]
+                and snake_body["y"] == snake_coords[self.HEAD]["y"]
+            ):
                 tag = 2  # Snake touches its body
 
         return tag
@@ -209,15 +222,17 @@ class Snake:
     # then modifying the content of the parameters in the function will affect the objects outside the function.
     def snake_is_eat_food(self, snake_coords, food):
         flag = False
-        if snake_coords[self.HEAD]['x'] == food['x'] and \
-                snake_coords[self.HEAD]['y'] == food['y']:
+        if (
+            snake_coords[self.HEAD]["x"] == food["x"]
+            and snake_coords[self.HEAD]["y"] == food["y"]
+        ):
             while True:
-                food['x'] = random.randint(0, self.map_width - 1)
-                food['y'] = random.randint(0, self.map_height - 1)
+                food["x"] = random.randint(0, self.map_width - 1)
+                food["y"] = random.randint(0, self.map_height - 1)
                 # food location reset
                 tag = 0
                 for coord in snake_coords:
-                    if [coord['x'], coord['y']] == [food['x'], food['y']]:
+                    if [coord["x"], coord["y"]] == [food["x"], food["y"]]:
                         tag = 1
                         break
 
@@ -236,12 +251,15 @@ class Snake:
 
     # Food is randomly generated
     def get_random_location(self):
-        return {'x': random.randint(0, self.map_width - 1), 'y': random.randint(0, self.map_height - 1)}
+        return {
+            "x": random.randint(0, self.map_width - 1),
+            "y": random.randint(0, self.map_height - 1),
+        }
 
     # draw grades
     def draw_score(self, screen, score):
-        font = pygame.font.SysFont('Arial', 28)
-        scoreSurf = font.render('Score: %s' % score, True, self.white)
+        font = pygame.font.SysFont("Arial", 28)
+        scoreSurf = font.render("Score: %s" % score, True, self.white)
         scoreRect = scoreSurf.get_rect()
         scoreRect.topleft = (self.windows_width - 130, 0)
         screen.blit(scoreSurf, scoreRect)
@@ -254,14 +272,16 @@ class Snake:
 
     def screenTensor(self):
         self.render()
-        image_data = pygame.surfarray.array3d(
-            pygame.display.get_surface()
-        ).transpose((1, 0, 2))
+        image_data = pygame.surfarray.array3d(pygame.display.get_surface()).transpose(
+            (1, 0, 2)
+        )
         img = Image.fromarray(image_data.astype(np.uint8))
-        transform = transforms.Compose([
-            transforms.Resize((50, 50)),  # Only PIL images can be cropped
-            transforms.ToTensor(),
-        ])
+        transform = transforms.Compose(
+            [
+                transforms.Resize((50, 50)),  # Only PIL images can be cropped
+                transforms.ToTensor(),
+            ]
+        )
         img_tensor = transform(img)
 
         return img_tensor
@@ -272,7 +292,7 @@ def filter_pkl(lists):
     count = len(lists)
     for i in range(count):
         tmp = lists[i]
-        if tmp[-4:] == '.pkl':
+        if tmp[-4:] == ".pkl":
             new_list.append(tmp)
 
     return new_list
@@ -283,10 +303,10 @@ def get_latest_weight(path):
         lists = os.listdir(path)
         lists = filter_pkl(lists)
         lists.sort(key=lambda x: os.path.getmtime((path + "\\" + x)))
-        return path + '/' + lists[-1]
+        return path + "/" + lists[-1]
 
     else:
-        print('Path: ' + path + ' not exist')
+        print("Path: " + path + " not exist")
         exit()
 
 
@@ -296,7 +316,7 @@ if __name__ == "__main__":
     env.snake_speed = 10
     agent = AgentDiscretePPO()
     agent.init(512, 6, 4)
-    latest_weight = get_latest_weight('./history/')
+    latest_weight = get_latest_weight("./history/")
     agent.act.load_state_dict(torch.load(latest_weight))
     for _ in range(15):
         o = env.reset()

@@ -7,7 +7,7 @@ from tqdm import tqdm
 from snake import Snake
 from painter import Painter
 from ppo import ReplayBuffer
-from Agent import AgentDiscretePPO
+from agent import AgentDiscretePPO
 
 
 MAX_EPISODE = 800
@@ -32,21 +32,21 @@ def testAgent(test_env, agent):
 
 
 def time_stamp(episode, rwd):
-    now = int(round(time.time()*1000))
-    res = time.strftime("_%Y-%m-%d-%H-%M-%S_", time.localtime(now/1000))
-    res += str(episode) + '_' + str(rwd)
+    now = int(round(time.time() * 1000))
+    res = time.strftime("_%Y-%m-%d-%H-%M-%S_", time.localtime(now / 1000))
+    res += str(episode) + "_" + str(rwd)
     return res
 
 
 def save_model(episode, ep_reward):
-    log_path = './history/'
-    print('Save model!')
-    if (not os.path.exists(log_path)):
+    log_path = "./history/"
+    print("Save model!")
+    if not os.path.exists(log_path):
         os.mkdir(log_path)
 
     torch.save(
         agent.act.state_dict(),
-        f'{log_path}act-weight{time_stamp(episode, ep_reward)}.pkl'
+        f"{log_path}act-weight{time_stamp(episode, ep_reward)}.pkl",
     )
 
 
@@ -63,7 +63,7 @@ if __name__ == "__main__":
     rewardList = []
     maxReward = -np.inf
 
-    for episode in tqdm(range(MAX_EPISODE), desc='Training agent...'):
+    for episode in tqdm(range(MAX_EPISODE), desc="Training agent..."):
         with torch.no_grad():
             trajectory_list = agent.explore_env(env, 2**12, 1, 0.99)
 
@@ -76,11 +76,11 @@ if __name__ == "__main__":
             save_model(episode, ep_reward)
 
     pygame.quit()
-    rwd_path = f'./history/reward{time_stamp(MAX_EPISODE, maxReward)}.csv'
+    rwd_path = f"./history/reward{time_stamp(MAX_EPISODE, maxReward)}.csv"
     painter = Painter(load_csv=True, load_dir=rwd_path)
-    painter.addData(rewardList, 'PPO')
+    painter.addData(rewardList, "PPO")
     painter.saveData(rwd_path)
-    painter.setTitle('snake game reward')
-    painter.setXlabel('episode')
-    painter.setYlabel('reward')
+    painter.setTitle("snake game reward")
+    painter.setXlabel("episode")
+    painter.setYlabel("reward")
     painter.drawFigure()
