@@ -302,9 +302,8 @@ def get_latest_weight(path):
     if os.path.exists(path):
         lists = os.listdir(path)
         lists = filter_pkl(lists)
-        lists.sort(key=lambda x: os.path.getmtime((path + "\\" + x)))
-        return path + "/" + lists[-1]
-
+        lists.sort(key=lambda x: os.path.getmtime(os.path.join(path, x)))
+        return os.path.join(path, lists[-1])
     else:
         print("Path: " + path + " not exist")
         exit()
@@ -323,7 +322,11 @@ if __name__ == "__main__":
         while 1:
             env.render()
             for event in pygame.event.get():
-                pass  # If you don't add this render, it will freeze
+                if event.type == QUIT:
+                    env.terminate()
+                elif event.type == KEYDOWN:
+                    if event.key == K_ESCAPE:
+                        env.terminate()
 
             a, _ = agent.select_action(o)
             o2, r, d, _ = env.step(a)
