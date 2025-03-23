@@ -16,6 +16,10 @@
 
 ## 环境设置
 1. 创建虚拟环境：
+macOS
+```bash
+brew install sdl2 sdl2_gfx sdl2_image sdl2_mixer sdl2_net sdl2_ttf
+
 ```bash
 pyenv virtualenv 3.11.5 snake-env
 pyenv activate snake-env
